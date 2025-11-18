@@ -1,15 +1,46 @@
+/* 1. Import Tailwind’s engine */
 @import "tailwindcss";
 
+/* 2. Define all your design tokens in a single @theme block */
+@theme {
+  /* ─── Font Families ───────────────────────────────────────────────── */
+  /* These take the place of theme.extend.fontFamily */
+  --font-geist-sans: var(
+    --font-geist-sans
+  ); /* e.g. loaded via @import or <link> */
+  --font-geist-mono: var(
+    --font-geist-mono
+  ); /* e.g. loaded via @import or <link> */
+  --font-sans: var(--font-geist-sans); /* maps to .font-sans utility */
+  --font-mono: var(--font-geist-mono); /* maps to .font-mono utility */
+
+  /* ─── Gradients (backgroundImage) ──────────────────────────────── */
+  /* These replace theme.extend.backgroundImage in CSS-first style */
+  --gradient-radial: radial-gradient(
+    var(--tw-gradient-stops)
+  ); /* .bg-gradient-radial */
+  --gradient-conic: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  ); /* .bg-gradient-conic */
+
+  /* ─── Brand Colors ──────────────────────────────────────────────── */
+  /* Maps each nested color key to a --color-<name> variable */
+  --color-brand-dark: #23272e; /* .text-brand-dark, .bg-brand-dark, etc. */
+  --color-brand-white: #ffffff; /* .text-brand-white, .bg-brand-white, etc. */
+  --color-brand-main: #115d8b; /* .text-brand-main, .bg-brand-main, etc. */
+  --color-brand-ash: #8b909a; /* .text-brand-ash, .bg-brand-ash, etc. */
+  --color-brand-ashbg: #fafafa;
+  --color-brand-secondary: #b1d362; /* .text-brand-secondary, .bg-brand-secondary, etc. */
+  --color-brand-lightYellow: #fcff45; /* .text-brand-lightYellow, .bg-brand-lightYellow, etc. */
+  --color-brand-grayish: #7b7b7b; /* .text-brand-grayish, .bg-brand-grayish, etc. */
+  --color-brand-graybg: #f1f2f6; /* .text-brand-grayish, .bg-brand-grayish, etc. */
+}
+
+/* 3. Optional: your custom CSS variables for theming/dark mode */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +50,25 @@
   }
 }
 
+/* 4. Tailwind base/components/utilities layers */
+/* @tailwind base;
+@tailwind components; */
+@tailwind utilities;
+
+/* 5. Your existing global styles */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.glass-fx {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background-color: #ffffff40;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.transition-fx {
+  transition: all 300ms ease-in-out;
 }
