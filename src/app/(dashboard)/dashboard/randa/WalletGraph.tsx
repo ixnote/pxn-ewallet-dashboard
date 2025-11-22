@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingDown, TrendingUp } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   AreaChart,
   Area,
@@ -10,27 +10,108 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const walletData = [
-  { month: "Jan", income: 7200, profit: 3200 },
-  { month: "Feb", income: 8900, profit: 4300 },
-  { month: "Mar", income: 11350, profit: 5700 },
-  { month: "Apr", income: 9800, profit: 6100 },
-  { month: "May", income: 14500, profit: 7600 },
-  { month: "Jun", income: 16300, profit: 8700 },
-  { month: "Jul", income: 19800, profit: 9400 },
-  { month: "Aug", income: 22000, profit: 10200 },
-  { month: "Sep", income: 24300, profit: 12000 },
-  { month: "Oct", income: 28000, profit: 13500 },
-  { month: "Nov", income: 30000, profit: 14800 },
-  { month: "Dec", income: 32700, profit: 16000 },
-];
+import { useTransactions } from "@/hooks/useTransactions";
+import Spinner from "@/components/spinner/Spinner";
 
 type WalletGraphProps = {
   dashboard?: boolean;
 };
 
 const WalletGraph = ({ dashboard }: WalletGraphProps) => {
+  // Fetch all transactions with a large page size to get historical data
+  const { data: transactionsData, isLoading: transactionsLoading } =
+    useTransactions({
+      page: 1,
+      pageSize: 1000, // Fetch a large number to get enough data for the chart
+    });
+
+  // Process transactions data to group by month
+  const walletData = useMemo(() => {
+    if (!transactionsData?.data?.transactions) {
+      return [];
+    }
+
+    const transactions = transactionsData.data.transactions;
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Initialize data structure for last 12 months
+    const now = new Date();
+    const last12Months: { month: string; income: number; profit: number }[] =
+      [];
+
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      last12Months.push({
+        month: monthNames[date.getMonth()],
+        income: 0,
+        profit: 0,
+      });
+    }
+
+    // Group transactions by month
+    transactions.forEach((transaction) => {
+      if (!transaction.createdAt) return;
+
+      const transactionDate = new Date(transaction.createdAt);
+      const monthIndex = transactionDate.getMonth();
+      const year = transactionDate.getFullYear();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      // Only include transactions from the last 12 months
+      const monthsAgo = (currentYear - year) * 12 + (currentMonth - monthIndex);
+      if (monthsAgo < 0 || monthsAgo > 11) return;
+
+      const dataIndex = 11 - monthsAgo;
+      if (dataIndex < 0 || dataIndex >= last12Months.length) return;
+
+      const amount = parseFloat(transaction.amount) || 0;
+
+      // Categorize transactions
+      // In-wallet transactions: wallet_type exists and is not null
+      // Cross-wallet transactions: transactions that involve bank transfers or external services
+      if (transaction.wallet_type && transaction.wallet_type !== null) {
+        last12Months[dataIndex].income += amount;
+      } else {
+        // Cross-wallet or external transactions
+        last12Months[dataIndex].profit += amount;
+      }
+    });
+
+    return last12Months;
+  }, [transactionsData]);
+
+  // Calculate totals for the stats
+  const totalTransactions = transactionsData?.data?.pagination?.total || 0;
+  const completedTransactions = useMemo(() => {
+    if (!transactionsData?.data?.transactions) return 0;
+    return transactionsData.data.transactions.filter((t) => t.confirmed).length;
+  }, [transactionsData]);
+
+  if (transactionsLoading) {
+    return (
+      <div className="w-full flex flex-col gap-10">
+        <div className="bg-brand-white rounded-lg p-4 flex flex-col gap-4 shadow-lg">
+          <div className="flex items-center justify-center h-[300px]">
+            <Spinner />
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="w-full flex flex-col gap-10">
@@ -73,20 +154,52 @@ const WalletGraph = ({ dashboard }: WalletGraphProps) => {
             >
               <div className="w-full flex gap-8 items-center">
                 <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-main text-brand-main">
-                  <span>27.6k</span>
+                  <span>
+                    {totalTransactions >= 1000
+                      ? `${(totalTransactions / 1000).toFixed(1)}k`
+                      : totalTransactions}
+                  </span>
                   <span>Total Transactions</span>
                 </span>
                 <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                  <span>3.2k</span>
+                  <span>
+                    {completedTransactions >= 1000
+                      ? `${(completedTransactions / 1000).toFixed(1)}k`
+                      : completedTransactions}
+                  </span>
                   <span>Completed</span>
                 </span>
                 <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                  <span>1.2k</span>
-                  <span>Profit</span>
+                  <span>
+                    {walletData.length > 0
+                      ? walletData.reduce(
+                          (sum, month) => sum + month.profit,
+                          0
+                        ) >= 1000
+                        ? `${(
+                            walletData.reduce(
+                              (sum, month) => sum + month.profit,
+                              0
+                            ) / 1000
+                          ).toFixed(1)}k`
+                        : walletData.reduce(
+                            (sum, month) => sum + month.profit,
+                            0
+                          )
+                      : 0}
+                  </span>
+                  <span>Cross-Wallet</span>
                 </span>
                 <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                  <span>1.7k</span>
-                  <span>Failed</span>
+                  <span>
+                    {totalTransactions - completedTransactions >= 1000
+                      ? `${(
+                          (totalTransactions - completedTransactions) /
+                          1000
+                        ).toFixed(1)}k`
+                      : totalTransactions - completedTransactions}
+                  </span>
+                  <span>Pending</span>
                 </span>
               </div>
               <div className="flex gap-6 items-center justify-end text-sm w-full">
@@ -110,7 +223,11 @@ const WalletGraph = ({ dashboard }: WalletGraphProps) => {
               <div className="w-full h-80 mt-4 flex items-center gap-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={walletData}
+                    data={
+                      walletData.length > 0
+                        ? walletData
+                        : [{ month: "No data", income: 0, profit: 0 }]
+                    }
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                   >
                     <defs>
@@ -257,7 +374,11 @@ const WalletGraph = ({ dashboard }: WalletGraphProps) => {
               <div className="w-full h-80 mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={walletData}
+                    data={
+                      walletData.length > 0
+                        ? walletData
+                        : [{ month: "No data", income: 0, profit: 0 }]
+                    }
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                   >
                     <defs>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Store, Bike, User, X } from "lucide-react";
 
 const OneOrderModal = ({ id, setShowModal, showModal }: any) => {
-  console.log({ id });
+  // console.log({ id });
   // if (!id) {
   //   return (
   //     <div className="p-8 w-full flex flex-col gap-8 items-center justify-center text-brand-main bg-brand-white rounded-lg">

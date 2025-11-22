@@ -54,8 +54,9 @@ export interface GetAllUsersQuery {
 }
 
 export interface GetAllUsersResponse<T> {
+  status: boolean;
+  message: string;
   data: {
-    status: boolean;
     users: T[];
     pagination: {
       page: number;
@@ -64,7 +65,6 @@ export interface GetAllUsersResponse<T> {
       total: number;
       totalPages: number;
     };
-    message?: string;
   };
 }
 

@@ -18,7 +18,7 @@ const GeneralProvider = (props: unknown) => {
   //*******/
 
   useEffect(() => {
-    console.log("__3d1k4N.init");
+    // console.log("__3d1k4N.init");
   }, []);
 
   return (

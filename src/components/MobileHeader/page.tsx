@@ -49,7 +49,7 @@ const MobileNav = () => {
 
   useEffect(() => {
     if (activeTopicTag) {
-      console.log("🚀 ~ useEffect ~ activeTopicTag:", activeTopicTag);
+      // console.log("🚀 ~ useEffect ~ activeTopicTag:", activeTopicTag);
       setIsOpen(!isOpen);
       router.push("/resource");
     }

@@ -28,7 +28,7 @@ const Dashboard = () => {
         {/* <RevenueGraph /> */}
 
         {/* Orders */}
-        <OrderGraph dashboard />
+        {/* <OrderGraph dashboard /> */}
       </div>
     </>
   );

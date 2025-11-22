@@ -17,6 +17,7 @@ import {
   BookMarked,
   Headphones,
   Settings,
+  Bell,
 } from "lucide-react";
 import { useGeneralContext } from "@/context/GenralContext";
 import Link from "next/link";
@@ -81,6 +82,11 @@ export const navItemsMdaAdmin = [
     icon: <BookMarked />,
   },
   {
+    title: "Notifications",
+    link: "/dashboard/notifications",
+    icon: <Bell />,
+  },
+  {
     title: "Support Center",
     link: "/dashboard/support",
     icon: <Headphones />,
@@ -97,9 +103,12 @@ const SideNavBar = () => {
   const { user }: any = useGeneralContext();
 
   const handleLogout = () => {
-    push("/");
+    localStorage.removeItem("authToken");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("tokenExpiration");
+    push("/login");
   };
 
   const navBar = user?.role === "super" ? navItemsSuperAdmin : navItemsMdaAdmin;

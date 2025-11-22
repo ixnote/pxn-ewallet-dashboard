@@ -61,7 +61,7 @@ const Users = () => {
     id: "",
   });
 
-  console.log("All users: ", allUsers);
+  // console.log("All users: ", allUsers);
 
   // Fetch user statistics based on selected role
   const { data: userStats } = useUserStatistics(
@@ -142,8 +142,8 @@ const Users = () => {
     );
   }
 
-  const users = allUsers?.users || [];
-  const pagination = allUsers?.pagination;
+  const users = allUsers?.data?.users || [];
+  const pagination = allUsers?.data?.pagination;
 
   // Get user type icon
   const getUserTypeIcon = (roles: string[]) => {
@@ -201,10 +201,25 @@ const Users = () => {
   };
 
   // Get time ago
-  const getTimeAgo = (dateString: string) => {
+  const getTimeAgo = (dateString: string | null | undefined) => {
+    if (!dateString) {
+      return "Never";
+    }
+
     const now = new Date();
     const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return "Never";
+    }
+
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    // Handle negative differences (future dates)
+    if (diffInSeconds < 0) {
+      return "Just now";
+    }
 
     if (diffInSeconds < 60) return `${diffInSeconds} secs ago`;
     if (diffInSeconds < 3600)

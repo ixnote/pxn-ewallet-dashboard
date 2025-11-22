@@ -9,37 +9,88 @@ import {
   ZAxis,
   Tooltip,
 } from "recharts";
-
-const users = [
-  { name: "Consumers", value: 39500, fill: "#0F5D8C" },
-  { name: "Vendors", value: 11200, fill: "#00CFFF" },
-  { name: "Riders", value: 3400, fill: "#E19800" },
-];
+import { useUserStatistics } from "@/hooks/useUsers";
+import Spinner from "@/components/spinner/Spinner";
 
 // Normalize radius
 const minRadius = 60;
 const maxRadius = 110;
-// const minRadius = 40;
-// const maxRadius = 90;
-const maxValue = Math.max(...users.map((u) => u.value));
-const scaled = users.map((user) => {
-  const radius = (user.value / maxValue) * (maxRadius - minRadius) + minRadius;
-  return { ...user, radius };
-});
-
-// Clustered layout: slightly overlapping or tightly packed
-const clusteredData = [
-  { ...scaled[0], x: 3.5, y: 12.5, z: scaled[0].radius }, // Center bubble // dark blue
-  { ...scaled[1], x: 6.5, y: 10, z: scaled[1].radius }, // Right bubble  // light blue
-  { ...scaled[2], x: 4.5, y: 6.5, z: scaled[2].radius }, // Left bubble  // orange
-];
-// const clusteredData = [
-//   { ...scaled[0], x: 100, y: 100, z: scaled[0].radius }, // Center bubble
-//   { ...scaled[1], x: 150, y: 130, z: scaled[1].radius }, // Right bubble
-//   { ...scaled[2], x: 70, y: 150, z: scaled[2].radius }, // Left bubble
-// ];
 
 export default function BubbleClusterChart() {
+  // Fetch statistics for each role
+  const { data: customerStats, isLoading: customerLoading } =
+    useUserStatistics("customer");
+  const { data: riderStats, isLoading: riderLoading } =
+    useUserStatistics("rider");
+  const { data: vendorStats, isLoading: vendorLoading } =
+    useUserStatistics("storeOwner");
+
+  const isLoading = customerLoading || riderLoading || vendorLoading;
+
+  // Extract total users for each role
+  const users = [
+    {
+      name: "Consumers",
+      value: customerStats?.data?.totalUsers || 0,
+      fill: "#0F5D8C",
+    },
+    {
+      name: "Vendors",
+      value: vendorStats?.data?.totalUsers || 0,
+      fill: "#00CFFF",
+    },
+    {
+      name: "Riders",
+      value: riderStats?.data?.totalUsers || 0,
+      fill: "#E19800",
+    },
+  ];
+
+  // Filter out users with 0 value and ensure we have at least some data
+  const validUsers = users.filter((u) => u.value > 0);
+
+  // Show loading spinner while data is being fetched
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg p-4 w-full flex flex-col gap-8 shadow-lg">
+        <div className="flex flex-col gap-4 w-full">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex flex-col items-start">
+              <span className="text-brand-main text-sm">USERS</span>
+              <span className="text-brand-ash text-sm">LAST 12 MONTHS</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-[350px]">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
+
+  // Normalize radius based on max value
+  const maxValue = Math.max(...validUsers.map((u) => u.value));
+  const scaled = validUsers.map((user) => {
+    const radius =
+      (user.value / maxValue) * (maxRadius - minRadius) + minRadius;
+    return { ...user, radius };
+  });
+
+  // Clustered layout: slightly overlapping or tightly packed
+  const clusteredData = scaled.map((user, index) => {
+    // Position bubbles in a triangular pattern
+    const positions = [
+      { x: 3.5, y: 12.5 }, // Center
+      { x: 6.5, y: 10 }, // Right
+      { x: 4.5, y: 6.5 }, // Left
+    ];
+    return {
+      ...user,
+      x: positions[index % positions.length].x,
+      y: positions[index % positions.length].y,
+      z: user.radius,
+    };
+  });
   return (
     <div className="bg-white rounded-lg p-4 w-full flex flex-col gap-8 shadow-lg">
       {/* top */}
@@ -98,7 +149,9 @@ export default function BubbleClusterChart() {
                     fontWeight="bold"
                     fontSize={16}
                   >
-                    {(payload.value / 1000).toFixed(1)}k
+                    {payload.value >= 1000
+                      ? `${(payload.value / 1000).toFixed(1)}k`
+                      : payload.value}
                   </text>
                 </g>
               )}

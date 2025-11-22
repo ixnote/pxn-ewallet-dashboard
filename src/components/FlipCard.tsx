@@ -35,7 +35,7 @@ const FlipCard = ({
 
   // Generate QR Code URL
   const qrUrl = "https://www.usepays.co/cashout";
-  console.log(voucherDetails);
+  // console.log(voucherDetails);
   return (
     <div className="flex items-center justify-center bg-gray-100">
       <div className="relative w-[300px] h-[240px] sm:w-[313px] sm:h-[370px] perspective">

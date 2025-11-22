@@ -4,6 +4,7 @@ import type {
   TransactionsResponse,
   SingleTransactionResponse,
 } from "@/lib/interfaces/transaction.interface";
+import { getAuthHeaders } from "./auth.helper";
 
 export const transactionApi = {
   async getAllTransactions(params: GetAllTransactionsQuery) {
@@ -16,14 +17,20 @@ export const transactionApi = {
 
     const response = await axios.get<TransactionsResponse>(
       `${process.env.NEXT_PUBLIC_API_URL}/dashboard/transactions`,
-      { params: cleanParams }
+      {
+        params: cleanParams,
+        headers: getAuthHeaders(),
+      }
     );
     return response.data;
   },
 
   async getTransactionById(id: string | number) {
     const response = await axios.get<SingleTransactionResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/transactions/${id}`
+      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/transactions/${id}`,
+      {
+        headers: getAuthHeaders(),
+      }
     );
     return response.data;
   },

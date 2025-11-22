@@ -11,7 +11,7 @@ const page = () => {
     <>
       <div className="w-full flex flex-col gap-10 pb-8">
         {/* Revenue */}
-        <RevenueGraph />
+        {/* <RevenueGraph /> */}
 
         {/* Wallet */}
         <WalletGraph />
@@ -20,7 +20,7 @@ const page = () => {
         <UserGraph />
 
         {/* Orders */}
-        <OrderGraph />
+        {/* <OrderGraph /> */}
       </div>
     </>
   );

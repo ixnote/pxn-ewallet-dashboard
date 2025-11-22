@@ -11,6 +11,7 @@ export const userKeys = {
   list: (params: GetAllUsersQuery) => ["users", "list", params] as const,
   detail: (id: string) => ["users", id] as const,
   statistics: (role?: string) => ["users", "statistics", role] as const,
+  current: () => ["users", "current"] as const,
 };
 
 // Fetch all users
@@ -36,6 +37,16 @@ export function useUserStatistics(role?: string) {
     queryKey: userKeys.statistics(role),
     queryFn: () => userApi.getUserStatistics(role),
     staleTime: 1000 * 60 * 2, // 2 minutes - stats don't change often
+  });
+}
+
+// Fetch current logged-in user
+export function useCurrentUser() {
+  return useQuery({
+    queryKey: userKeys.current(),
+    queryFn: () => userApi.getCurrentUser(),
+    staleTime: 1000 * 60 * 5, // 5 minutes - user data doesn't change often
+    retry: 1,
   });
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUpRight, Bike, Store, User } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -10,27 +10,122 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const userBarData = [
-  { month: "Jan", consumers: 23000, riders: 8000, vendors: 7000 },
-  { month: "Feb", consumers: 24000, riders: 8500, vendors: 7500 },
-  { month: "Mar", consumers: 23500, riders: 8200, vendors: 7300 },
-  { month: "Apr", consumers: 23800, riders: 8100, vendors: 7200 },
-  { month: "May", consumers: 24000, riders: 8000, vendors: 7100 },
-  { month: "Jun", consumers: 24200, riders: 8400, vendors: 7200 },
-  { month: "Jul", consumers: 24100, riders: 8600, vendors: 7400 },
-  { month: "Aug", consumers: 24300, riders: 8800, vendors: 7600 },
-  { month: "Sep", consumers: 24500, riders: 8500, vendors: 7700 },
-  { month: "Oct", consumers: 24400, riders: 8400, vendors: 7800 },
-  { month: "Nov", consumers: 24600, riders: 8300, vendors: 7900 },
-  { month: "Dec", consumers: 24700, riders: 8200, vendors: 8000 },
-];
+import { useUsers, useUserStatistics } from "@/hooks/useUsers";
+import Spinner from "@/components/spinner/Spinner";
 
 type UserGraphProps = {
   dashboard?: boolean;
 };
 
 const UserGraph = ({ dashboard }: UserGraphProps) => {
+  // Fetch all users with a large page size to get historical data
+  const { data: usersData, isLoading: usersLoading } = useUsers({
+    role: "",
+    page: 1,
+    pageSize: 1000, // Fetch a large number to get enough data for the chart
+    search: "",
+    status: "",
+    createdAtStart: "",
+    id: "",
+  });
+
+  // Fetch user statistics for totals
+  const { data: userStats } = useUserStatistics();
+
+  // Process users data to group by month and role
+  const userBarData = useMemo(() => {
+    if (!usersData?.data?.users) {
+      return [];
+    }
+
+    const users = usersData.data.users;
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Initialize data structure for last 12 months
+    const now = new Date();
+    const last12Months: {
+      month: string;
+      consumers: number;
+      riders: number;
+      vendors: number;
+    }[] = [];
+
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      last12Months.push({
+        month: monthNames[date.getMonth()],
+        consumers: 0,
+        riders: 0,
+        vendors: 0,
+      });
+    }
+
+    // Group users by month and role
+    users.forEach((user) => {
+      if (!user.createdAt) return;
+
+      const userDate = new Date(user.createdAt);
+      const monthIndex = userDate.getMonth();
+      const year = userDate.getFullYear();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      // Only include users from the last 12 months
+      const monthsAgo = (currentYear - year) * 12 + (currentMonth - monthIndex);
+      if (monthsAgo < 0 || monthsAgo > 11) return;
+
+      const dataIndex = 11 - monthsAgo;
+      if (dataIndex < 0 || dataIndex >= last12Months.length) return;
+
+      // Determine user role
+      if (user.roles.includes("storeOwner")) {
+        last12Months[dataIndex].vendors++;
+      } else if (user.roles.includes("rider")) {
+        last12Months[dataIndex].riders++;
+      } else if (user.roles.includes("customer")) {
+        last12Months[dataIndex].consumers++;
+      }
+    });
+
+    // Calculate cumulative totals (users created up to that month)
+    const cumulativeData: typeof last12Months = [];
+    last12Months.forEach((month, index) => {
+      const prevMonth = index > 0 ? cumulativeData[index - 1] : null;
+      cumulativeData.push({
+        month: month.month,
+        consumers: (prevMonth?.consumers || 0) + month.consumers,
+        riders: (prevMonth?.riders || 0) + month.riders,
+        vendors: (prevMonth?.vendors || 0) + month.vendors,
+      });
+    });
+
+    return cumulativeData;
+  }, [usersData]);
+
+  if (usersLoading) {
+    return (
+      <div className="w-full flex flex-col gap-10">
+        <div className="bg-white rounded-lg p-4 w-full flex flex-col gap-8 shadow-lg">
+          <div className="flex items-center justify-center h-[300px]">
+            <Spinner />
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="w-full flex flex-col gap-10">
@@ -69,10 +164,10 @@ const UserGraph = ({ dashboard }: UserGraphProps) => {
                 <>
                   <div className="flex items-center gap-4">
                     <span className="text-brand-dark text-xl font-bold">
-                      N9.2M
+                      {userStats?.data?.totalUsers?.toLocaleString() || 0}
                     </span>
                     <span className="flex gap-1 items-center text-xs bg-green-200 text-green-600 px-2">
-                      28.4%
+                      {userStats?.data?.newUsers || 0} new
                       <ArrowUpRight />
                     </span>
                   </div>
@@ -81,23 +176,61 @@ const UserGraph = ({ dashboard }: UserGraphProps) => {
                 <>
                   <div className="w-full flex gap-8 items-center">
                     <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-main text-brand-main">
-                      <span>27.6k</span>
+                      <span>
+                        {userStats?.data?.totalUsers
+                          ? userStats.data.totalUsers >= 1000
+                            ? `${(userStats.data.totalUsers / 1000).toFixed(
+                                1
+                              )}k`
+                            : userStats.data.totalUsers
+                          : 0}
+                      </span>
                       <span>Total Users</span>
                     </span>
                     <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                      <span>3.2k</span>
+                      <span>
+                        {userStats?.data?.activeUsers
+                          ? userStats.data.activeUsers >= 1000
+                            ? `${(userStats.data.activeUsers / 1000).toFixed(
+                                1
+                              )}k`
+                            : userStats.data.activeUsers
+                          : 0}
+                      </span>
                       <span>Active Users</span>
                     </span>
                     <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                      <span>1.2k</span>
+                      <span>
+                        {userStats?.data?.suspendedUsers
+                          ? userStats.data.suspendedUsers >= 1000
+                            ? `${(userStats.data.suspendedUsers / 1000).toFixed(
+                                1
+                              )}k`
+                            : userStats.data.suspendedUsers
+                          : 0}
+                      </span>
                       <span>Suspended Users</span>
                     </span>
                     <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                      <span>1.7k</span>
+                      <span>
+                        {userStats?.data?.bannedUsers
+                          ? userStats.data.bannedUsers >= 1000
+                            ? `${(userStats.data.bannedUsers / 1000).toFixed(
+                                1
+                              )}k`
+                            : userStats.data.bannedUsers
+                          : 0}
+                      </span>
                       <span>Banned Users</span>
                     </span>
                     <span className="transition-fx flex flex-col items-start gap-1 border-b-2 cursor-pointer border-brand-ash/80 text-brand-ash/80 hover:text-brand-main">
-                      <span>1.7k</span>
+                      <span>
+                        {userStats?.data?.newUsers
+                          ? userStats.data.newUsers >= 1000
+                            ? `${(userStats.data.newUsers / 1000).toFixed(1)}k`
+                            : userStats.data.newUsers
+                          : 0}
+                      </span>
                       <span>New Users</span>
                     </span>
                   </div>
@@ -128,7 +261,14 @@ const UserGraph = ({ dashboard }: UserGraphProps) => {
           </div>
 
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={userBarData} barCategoryGap="20%">
+            <BarChart
+              data={
+                userBarData.length > 0
+                  ? userBarData
+                  : [{ month: "No data", consumers: 0, riders: 0, vendors: 0 }]
+              }
+              barCategoryGap="20%"
+            >
               <XAxis
                 dataKey="month"
                 tick={{ fill: "#8b909a" }}
