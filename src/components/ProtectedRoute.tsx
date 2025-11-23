@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Spinner from "./spinner/Spinner";
+import { useInactivityTimeout } from "@/hooks/useInactivityTimeout";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,6 +17,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const isAuthPage = authPages.includes(pathname);
   const [isChecking, setIsChecking] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+
+  // Track inactivity timeout (1 hour)
+  useInactivityTimeout();
 
   // Track if component is mounted (client-side only)
   useEffect(() => {

@@ -35,6 +35,8 @@ export function useLogin() {
             Date.now() + data.authorization.expiresIn * 1000;
           localStorage.setItem("tokenExpiration", expirationTime.toString());
         }
+        // Initialize activity timestamp for inactivity tracking
+        localStorage.setItem("lastActivityTimestamp", Date.now().toString());
       }
 
       // Invalidate queries to refresh data

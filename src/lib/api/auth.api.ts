@@ -28,6 +28,7 @@ export const authApi = {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("userId");
       localStorage.removeItem("userRole");
+      localStorage.removeItem("tokenExpiration");
     }
   },
 
