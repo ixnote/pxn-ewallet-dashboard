@@ -62,19 +62,6 @@ const NavBar = () => {
   const notificationDropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleClickOutside = (event: MouseEvent | MouseEventInit) => {
-    const target = event.target as Node | null;
-    if (navRef.current && !navRef.current.contains(target)) {
-      setIsOpen(false);
-    }
-    if (
-      notificationDropdownRef.current &&
-      !notificationDropdownRef.current.contains(target)
-    ) {
-      setIsNotificationDropdownOpen(false);
-    }
-  };
-
   const handleNotificationClick = (notificationId: string) => {
     if (
       notifications.find((n) => n._id === notificationId)?.status === "unread"
@@ -86,8 +73,18 @@ const NavBar = () => {
 
   //to handle Click Outside the sidebar
   useEffect(() => {
-    const handleDocumentClick = (event: MouseEvent | MouseEventInit) => {
-      handleClickOutside(event);
+    const handleDocumentClick = (event: Event) => {
+      const target = event.target as Node | null;
+      if (navRef.current && target && !navRef.current.contains(target)) {
+        setIsOpen(false);
+      }
+      if (
+        notificationDropdownRef.current &&
+        target &&
+        !notificationDropdownRef.current.contains(target)
+      ) {
+        setIsNotificationDropdownOpen(false);
+      }
     };
 
     if (isOpen) {
