@@ -1,3 +1,15 @@
+export interface DeliveryAddress {
+  _id?: string;
+  address: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  coordinates?: number[];
+  isDefault?: boolean;
+  [key: string]: unknown;
+}
+
 export interface User {
   _id: string;
   id?: string; // For compatibility
@@ -17,7 +29,7 @@ export interface User {
   kycLevel: number;
   notification_counter: number;
   hasStore: boolean;
-  deliveryAddresses: unknown[];
+  deliveryAddresses: DeliveryAddress[];
   current_location?: {
     coordinates: number[];
     _id: string;
