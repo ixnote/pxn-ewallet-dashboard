@@ -129,32 +129,45 @@ export default function BubbleClusterChart() {
             <Tooltip />
             <Scatter
               data={clusteredData}
-              shape={({ cx, cy, z: r, payload }) => (
-                <g>
-                  <circle cx={cx} cy={cy} r={r} fill={payload.fill} />
-                  <text
-                    x={cx}
-                    y={cy - 6}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize={12}
-                  >
-                    {payload.name}
-                  </text>
-                  <text
-                    x={cx}
-                    y={cy + 12}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontWeight="bold"
-                    fontSize={16}
-                  >
-                    {payload.value >= 1000
-                      ? `${(payload.value / 1000).toFixed(1)}k`
-                      : payload.value}
-                  </text>
-                </g>
-              )}
+              shape={(props: {
+                cx?: number;
+                cy?: number;
+                z?: number;
+                payload?: { fill?: string; name?: string; value?: number };
+              }) => {
+                const {
+                  cx = 0,
+                  cy = 0,
+                  z: r = 0,
+                  payload: payloadData,
+                } = props;
+                return (
+                  <g>
+                    <circle cx={cx} cy={cy} r={r} fill={payloadData?.fill} />
+                    <text
+                      x={cx}
+                      y={cy - 6}
+                      textAnchor="middle"
+                      fill="#fff"
+                      fontSize={12}
+                    >
+                      {payloadData?.name}
+                    </text>
+                    <text
+                      x={cx}
+                      y={cy + 12}
+                      textAnchor="middle"
+                      fill="#fff"
+                      fontWeight="bold"
+                      fontSize={16}
+                    >
+                      {payloadData?.value && payloadData.value >= 1000
+                        ? `${(payloadData.value / 1000).toFixed(1)}k`
+                        : payloadData?.value}
+                    </text>
+                  </g>
+                );
+              }}
             />
           </ScatterChart>
         </ResponsiveContainer>
