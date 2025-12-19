@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeSVG } from "react-qr-code";
 
 import voucher_preview_one from "@/assets/imgs/vouchers/voucher_preview_one.jpg";
 import voucher_preview_two from "@/assets/imgs/vouchers/voucher_preview_two.jpg";
