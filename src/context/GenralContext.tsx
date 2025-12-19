@@ -1,8 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { success, error, info } from "@/helpers/Alert";
 import { createContext, useContext, useEffect, useState } from "react";
 
 export const GeneralContext = createContext({});

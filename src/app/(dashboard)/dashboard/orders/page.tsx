@@ -1,13 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Bike,
-  ChevronLeft,
-  ChevronRight,
-  Flag,
-  Store,
-  User,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import OneOrderModal from "./OneOrderModal";
 
 const Wallets = () => {

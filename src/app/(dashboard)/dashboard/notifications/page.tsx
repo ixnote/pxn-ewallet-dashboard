@@ -58,8 +58,12 @@ const NotificationsPage = () => {
       onSuccess: () => {
         success("All notifications marked as read");
       },
-      onError: (err: any) => {
-        error(err?.response?.data?.message || "Failed to mark all as read");
+      onError: (err: unknown) => {
+        const errorMessage =
+          err && typeof err === "object" && "response" in err
+            ? (err.response as { data?: { message?: string } })?.data?.message
+            : undefined;
+        error(errorMessage || "Failed to mark all as read");
       },
     });
   };
@@ -77,8 +81,12 @@ const NotificationsPage = () => {
         setShowBroadcastModal(false);
         setBroadcastForm({ title: "", body: "", isDraft: false });
       },
-      onError: (err: any) => {
-        error(err?.response?.data?.message || "Failed to create broadcast");
+      onError: (err: unknown) => {
+        const errorMessage =
+          err && typeof err === "object" && "response" in err
+            ? (err.response as { data?: { message?: string } })?.data?.message
+            : undefined;
+        error(errorMessage || "Failed to create broadcast");
       },
     });
   };

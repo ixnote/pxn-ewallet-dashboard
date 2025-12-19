@@ -1,9 +1,7 @@
 import React from "react";
-import RevenueGraph from "./randa/RevenueGraph";
 import WalletGraph from "./randa/WalletGraph";
 import UserGraph from "./randa/UserGraph";
 import UserBubbleGraph from "./randa/UserBubbleGraph";
-import OrderGraph from "./randa/OrderGraph";
 import DashboardMetrics from "./DashboardMetrics";
 
 const Dashboard = () => {

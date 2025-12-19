@@ -4,16 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/imgs/auth/pays_logo.png";
 import { useState, useRef, useEffect, MouseEvent } from "react";
-// import { useGeneralContext } from "../../../context/GenralContext";
-import { useRouter } from "next/navigation";
 
 const MobileNav = () => {
-  const router = useRouter();
-
-  const [activeTopicTag, setActiveTopicTag] = useState() as any;
-
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = (event: MouseEvent<HTMLButtonElement>) => {
@@ -21,39 +14,22 @@ const MobileNav = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleClickOutside = (event: any) => {
-    if (navRef.current && !navRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
-    }
-  };
-
   useEffect(() => {
-    const handleDocumentClick = (event: MouseEvent | MouseEventInit) => {
-      handleClickOutside(event);
+    const handleClickOutside = (event: Event) => {
+      const target = event.target as Node | null;
+      if (navRef.current && target && !navRef.current.contains(target)) {
+        setIsOpen(false);
+      }
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleDocumentClick);
-    } else {
-      document.removeEventListener("mousedown", handleDocumentClick);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
-
-  const handleDropdownToggle = (dropdown: string) => {
-    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
-  };
-
-  useEffect(() => {
-    if (activeTopicTag) {
-      // console.log("🚀 ~ useEffect ~ activeTopicTag:", activeTopicTag);
-      setIsOpen(!isOpen);
-      router.push("/resource");
-    }
-  }, [activeTopicTag]);
 
   return (
     <div

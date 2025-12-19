@@ -48,13 +48,17 @@ export function useLogin() {
       // Redirect to dashboard
       router.push("/dashboard");
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       const errorMessage =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Login failed. Please check your credentials.";
-      error(errorMessage);
+        err && typeof err === "object" && "response" in err
+          ? (err.response as { data?: { message?: string; error?: string } })
+              ?.data?.message ||
+            (err.response as { data?: { message?: string; error?: string } })
+              ?.data?.error
+          : err && typeof err === "object" && "message" in err
+          ? (err.message as string)
+          : undefined;
+      error(errorMessage || "Login failed. Please check your credentials.");
     },
   });
 }
@@ -82,12 +86,16 @@ export function useRequestPasswordReset() {
     onSuccess: (data) => {
       success(data.message || "Password reset OTP sent successfully");
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       const errorMessage =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to send password reset OTP. Please try again.";
-      error(errorMessage);
+        err && typeof err === "object" && "response" in err
+          ? (err.response as { data?: { message?: string } })?.data?.message
+          : err && typeof err === "object" && "message" in err
+          ? (err.message as string)
+          : undefined;
+      error(
+        errorMessage || "Failed to send password reset OTP. Please try again."
+      );
     },
   });
 }
@@ -98,12 +106,14 @@ export function useVerifyPasswordResetToken() {
     onSuccess: (data) => {
       success(data.message || "Token verified successfully");
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       const errorMessage =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Invalid or expired token. Please try again.";
-      error(errorMessage);
+        err && typeof err === "object" && "response" in err
+          ? (err.response as { data?: { message?: string } })?.data?.message
+          : err && typeof err === "object" && "message" in err
+          ? (err.message as string)
+          : undefined;
+      error(errorMessage || "Invalid or expired token. Please try again.");
     },
   });
 }
@@ -120,12 +130,14 @@ export function useResetPassword() {
         router.push("/login");
       }, 2000);
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       const errorMessage =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to reset password. Please try again.";
-      error(errorMessage);
+        err && typeof err === "object" && "response" in err
+          ? (err.response as { data?: { message?: string } })?.data?.message
+          : err && typeof err === "object" && "message" in err
+          ? (err.message as string)
+          : undefined;
+      error(errorMessage || "Failed to reset password. Please try again.");
     },
   });
 }

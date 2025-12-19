@@ -1,10 +1,8 @@
 "use client";
 
 import React from "react";
-import RevenueGraph from "./RevenueGraph";
 import WalletGraph from "./WalletGraph";
 import UserGraph from "./UserGraph";
-import OrderGraph from "./OrderGraph";
 
 const page = () => {
   return (

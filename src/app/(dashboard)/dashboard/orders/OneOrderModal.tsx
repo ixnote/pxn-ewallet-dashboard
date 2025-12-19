@@ -3,7 +3,13 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Store, Bike, User, X } from "lucide-react";
 
-const OneOrderModal = ({ id, setShowModal, showModal }: any) => {
+interface OneOrderModalProps {
+  id?: string;
+  setShowModal: (show: boolean) => void;
+  showModal: boolean;
+}
+
+const OneOrderModal = ({ setShowModal, showModal }: OneOrderModalProps) => {
   // console.log({ id });
   // if (!id) {
   //   return (

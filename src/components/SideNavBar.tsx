@@ -98,9 +98,15 @@ export const navItemsMdaAdmin = [
   },
 ];
 
+interface UserContext {
+  user?: {
+    role?: string;
+  };
+}
+
 const SideNavBar = () => {
   const { push } = useRouter();
-  const { user }: any = useGeneralContext();
+  const { user } = useGeneralContext() as UserContext;
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");

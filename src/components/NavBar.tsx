@@ -15,8 +15,7 @@ import {
 } from "@/hooks/useNotifications";
 
 const NavBar = () => {
-  const router = useRouter();
-  const { data: currentUser, isLoading } = useCurrentUser();
+  const { data: currentUser } = useCurrentUser();
   const { data: notificationsData } = useNotifications();
   const updateNotification = useUpdateNotification();
 
@@ -64,13 +63,14 @@ const NavBar = () => {
   const notificationDropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handleClickOutside = (event: any) => {
-    if (navRef.current && !navRef.current.contains(event.target as Node)) {
+  const handleClickOutside = (event: MouseEvent | MouseEventInit) => {
+    const target = event.target as Node | null;
+    if (navRef.current && !navRef.current.contains(target)) {
       setIsOpen(false);
     }
     if (
       notificationDropdownRef.current &&
-      !notificationDropdownRef.current.contains(event.target as Node)
+      !notificationDropdownRef.current.contains(target)
     ) {
       setIsNotificationDropdownOpen(false);
     }

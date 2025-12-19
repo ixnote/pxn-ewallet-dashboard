@@ -2,24 +2,22 @@ const seed = "373373373373";
 const nubanLength = 10;
 const serialNumLength = 9;
 
-
 const getAccountBanks = (accountNumber, banks) => {
-
   let suggestedBanks = [];
   let otherBanks = [];
 
-  banks && banks.map && banks.map(({ code, name }) => {
-    if (isBankAccountValid(accountNumber, code)) {
-      suggestedBanks.push({ code, name });
-    } else {
-      otherBanks.push({ code, name })
-    }
-  });
+  if (banks && banks.map) {
+    banks.map(({ code, name }) => {
+      if (isBankAccountValid(accountNumber, code)) {
+        suggestedBanks.push({ code, name });
+      } else {
+        otherBanks.push({ code, name });
+      }
+    });
+  }
 
   return suggestedBanks;
-}
-
-
+};
 
 const isBankAccountValid = (accountNumber, bankCode) => {
   if (!accountNumber || !accountNumber.length == nubanLength) {

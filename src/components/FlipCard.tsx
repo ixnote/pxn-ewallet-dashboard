@@ -6,7 +6,6 @@ import { QRCodeSVG } from "qrcode.react";
 
 import voucher_preview_one from "@/assets/imgs/vouchers/voucher_preview_one.jpg";
 import voucher_preview_two from "@/assets/imgs/vouchers/voucher_preview_two.jpg";
-import spikk_logo from "@/assets/imgs/vouchers/spikk_logo.svg";
 import pays_logo from "@/assets/imgs/auth/pays_logo.png";
 
 const FlipCard = ({
