@@ -3,7 +3,6 @@
 import React, { MouseEvent, useEffect, useRef, useState, useMemo } from "react";
 import { Menu, Bell, User } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import MobileSideNavBar from "./MobileSideBar";
 import Image from "next/image";
