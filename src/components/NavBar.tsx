@@ -1,6 +1,6 @@
 "use client";
 
-import React, { MouseEvent, useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Menu, Bell, User } from "lucide-react";
 import Link from "next/link";
 
