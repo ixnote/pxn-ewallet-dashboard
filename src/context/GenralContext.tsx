@@ -1,10 +1,20 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 export const GeneralContext = createContext({});
 
-const GeneralProvider = (props: unknown) => {
+interface GeneralProviderProps {
+  children: ReactNode;
+}
+
+const GeneralProvider = ({ children }: GeneralProviderProps) => {
   // MISC
   const [name, setName] = useState("EDDY");
 
@@ -26,7 +36,7 @@ const GeneralProvider = (props: unknown) => {
         setName,
       }}
     >
-      {props.children}
+      {children}
     </GeneralContext.Provider>
   );
 };
