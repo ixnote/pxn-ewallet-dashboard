@@ -8,12 +8,13 @@ import type {
 import type { ApiResponse } from "@/lib/interfaces/api.interface";
 import type { GetAllUsersResponse } from "@/lib/interfaces/user.interface";
 import { getAuthHeaders } from "./auth.helper";
+import { getApiUrl } from "@/lib/config/api.config";
 
 export const userApi = {
   // get current logged-in user
   async getCurrentUser() {
     const response = await axios.get<User>(
-      `${process.env.NEXT_PUBLIC_API_URL}/user`,
+      getApiUrl("/user"),
       {
         headers: getAuthHeaders(),
       }
@@ -24,8 +25,8 @@ export const userApi = {
   // get user statistics
   async getUserStatistics(role?: string) {
     const url = role
-      ? `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/statistics?role=${role}`
-      : `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/statistics`;
+      ? getApiUrl(`/dashboard/users/statistics?role=${role}`)
+      : getApiUrl("/dashboard/users/statistics");
 
     const response = await axios.get<UserStatisticsResponse>(url, {
       headers: getAuthHeaders(),
@@ -44,7 +45,7 @@ export const userApi = {
     );
 
     const response = await axios.get<GetAllUsersResponse<User>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users`,
+      getApiUrl("/dashboard/users"),
       {
         params: cleanParams,
         headers: getAuthHeaders(),
@@ -57,7 +58,7 @@ export const userApi = {
   // get user by id
   async getUserById(id: string) {
     const data = await axios.get<ApiResponse<User>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/${id}`,
+      getApiUrl(`/dashboard/users/${id}`),
       {
         headers: getAuthHeaders(),
       }
@@ -77,7 +78,7 @@ export const userApi = {
   // update user status
   async updateUserStatus(payload: UpdateUserStatusPayload) {
     const data = await axios.post<ApiResponse<User>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/update-status`,
+      getApiUrl("/dashboard/users/update-status"),
       payload,
       {
         headers: getAuthHeaders(),
@@ -97,7 +98,7 @@ export const userApi = {
   // suspend user
   async suspendUser(id: string) {
     const data = await axios.post<ApiResponse<User>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/${id}/suspend`,
+      getApiUrl(`/dashboard/users/${id}/suspend`),
       {},
       {
         headers: getAuthHeaders(),
@@ -109,7 +110,7 @@ export const userApi = {
   // ban user
   async banUser(id: string) {
     const data = await axios.post<ApiResponse<User>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/${id}/ban`,
+      getApiUrl(`/dashboard/users/${id}/ban`),
       {},
       {
         headers: getAuthHeaders(),
@@ -121,7 +122,7 @@ export const userApi = {
   // activate user
   async activateUser(id: string) {
     const data = await axios.post<ApiResponse<User>>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/${id}/activate`,
+      getApiUrl(`/dashboard/users/${id}/activate`),
       {},
       {
         headers: getAuthHeaders(),

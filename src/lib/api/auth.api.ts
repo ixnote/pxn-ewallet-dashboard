@@ -8,11 +8,12 @@ import type {
   PasswordReset,
   PasswordResetResponse,
 } from "@/lib/interfaces/auth.interface";
+import { getApiUrl } from "@/lib/config/api.config";
 
 export const authApi = {
   async login(credentials: LoginCredentials) {
     const response = await axios.post<LoginResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      getApiUrl("/auth/login"),
       {
         id: credentials.id,
         password: credentials.password,
@@ -34,7 +35,7 @@ export const authApi = {
 
   async requestPasswordReset(data: PasswordResetRequest) {
     const response = await axios.post<PasswordResetRequestResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/password-request`,
+      getApiUrl("/auth/password-request"),
       {
         email: data.email,
       }
@@ -44,14 +45,14 @@ export const authApi = {
 
   async verifyPasswordResetToken(code: string) {
     const response = await axios.post<PasswordResetVerifyResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/password-request/verify/${code}`
+      getApiUrl(`/auth/password-request/verify/${code}`)
     );
     return response.data;
   },
 
   async resetPassword(data: PasswordReset) {
     const response = await axios.put<PasswordResetResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/password-reset`,
+      getApiUrl("/auth/password-reset"),
       {
         token: data.token,
         password: data.password,

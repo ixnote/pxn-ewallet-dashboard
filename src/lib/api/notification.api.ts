@@ -8,12 +8,13 @@ import type {
   OpenAllNotificationsResponse,
 } from "@/lib/interfaces/notification.interface";
 import { getAuthHeaders } from "./auth.helper";
+import { getApiUrl } from "@/lib/config/api.config";
 
 export const notificationApi = {
   // Get all notifications
   async getAllNotifications() {
     const response = await axios.get<GetAllNotificationsResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/notification/all`,
+      getApiUrl("/notification/all"),
       {
         headers: getAuthHeaders(),
       }
@@ -24,7 +25,7 @@ export const notificationApi = {
   // Send broadcast
   async createBroadcast(payload: CreateBroadcastPayload) {
     const response = await axios.post<CreateBroadcastResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/notification/broadcast/create`,
+      getApiUrl("/notification/broadcast/create"),
       payload,
       {
         headers: getAuthHeaders(),
@@ -36,7 +37,7 @@ export const notificationApi = {
   // Update single notification status
   async updateNotification(payload: UpdateNotificationPayload) {
     const response = await axios.put<UpdateNotificationResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/notification/update`,
+      getApiUrl("/notification/update"),
       payload,
       {
         headers: getAuthHeaders(),
@@ -48,7 +49,7 @@ export const notificationApi = {
   // Open all notifications
   async openAllNotifications() {
     const response = await axios.put<OpenAllNotificationsResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/notification/open/all`,
+      getApiUrl("/notification/open/all"),
       {},
       {
         headers: getAuthHeaders(),

@@ -5,6 +5,7 @@ import type {
   SingleTransactionResponse,
 } from "@/lib/interfaces/transaction.interface";
 import { getAuthHeaders } from "./auth.helper";
+import { getApiUrl } from "@/lib/config/api.config";
 
 export const transactionApi = {
   async getAllTransactions(params: GetAllTransactionsQuery) {
@@ -16,7 +17,7 @@ export const transactionApi = {
     );
 
     const response = await axios.get<TransactionsResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/transactions`,
+      getApiUrl("/dashboard/transactions"),
       {
         params: cleanParams,
         headers: getAuthHeaders(),
@@ -27,7 +28,7 @@ export const transactionApi = {
 
   async getTransactionById(id: string | number) {
     const response = await axios.get<SingleTransactionResponse>(
-      `${process.env.NEXT_PUBLIC_API_URL}/dashboard/transactions/${id}`,
+      getApiUrl(`/dashboard/transactions/${id}`),
       {
         headers: getAuthHeaders(),
       }
