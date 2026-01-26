@@ -16,6 +16,7 @@ const ForgotPasswordPage = () => {
   const router = useRouter();
   const [step, setStep] = useState<Step>("request");
   const [email, setEmail] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -41,7 +42,8 @@ const ForgotPasswordPage = () => {
   const handleVerifyToken = async (e: React.FormEvent) => {
     e.preventDefault();
     verifyMutation.mutate(code, {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setVerifiedEmail(data.data?.email ?? email);
         setStep("reset");
       },
     });
@@ -58,6 +60,7 @@ const ForgotPasswordPage = () => {
       {
         token: code,
         password: password,
+        email: verifiedEmail || email,
       },
       {
         onSuccess: () => {

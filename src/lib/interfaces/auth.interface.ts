@@ -33,11 +33,13 @@ export interface PasswordResetRequestResponse {
 export interface PasswordResetVerifyResponse {
   success: boolean;
   message?: string;
+  data?: { email?: string };
 }
 
 export interface PasswordReset {
   token: string;
   password: string;
+  email: string;
 }
 
 export interface PasswordResetResponse {

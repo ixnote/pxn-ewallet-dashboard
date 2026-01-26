@@ -56,6 +56,7 @@ export const authApi = {
       {
         token: data.token,
         password: data.password,
+        email: data.email,
       }
     );
     return response.data;
